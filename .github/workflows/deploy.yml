@@ -41,7 +41,7 @@ jobs:
 
           echo "Creating .env file on server..."
           ssh -i key.pem -o "StrictHostKeyChecking=no" $EC2_USER@$EC2_HOST
-          "echo 'VITE_API_BASE_URL=$VITE_API_BASE_URL' > ~test/frontend/.env"
+          "echo 'VITE_API_BASE_URL=$VITE_API_BASE_URL' > ~/test/frontend/.env"
 
           echo "Creating .env file locally..."
           echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env
