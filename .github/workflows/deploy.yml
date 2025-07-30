@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        
       - name: Build the application
         run: npm run build
 
@@ -43,8 +46,11 @@ jobs:
           #ssh -i key.pem -o "StrictHostKeyChecking=no" $EC2_USER@$EC2_HOST
           #"echo 'VITE_API_BASE_URL=$VITE_API_BASE_URL' > ~/test/frontend/.env"
 
-          echo "Creating .env file locally..."
-          echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env
+          #echo "Creating .env file locally..."
+          #echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env
 
           echo "Deploying to server..."
           rsync -avz --delete  -e "ssh -i key.pem -o StrictHostKeyChecking=no" ./dist/ $EC2_USER@$EC2_HOST:~/test/frontend
+
+          echo "Reloading Nginx..."
+          ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "sudo systemctl reload nginx"
