@@ -37,7 +37,6 @@ jobs:
           ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "mkdir -p ~/test/frontend && chmod -R 755 ~/test/frontend"
           echo "Deploying files..."
           rsync -avz --delete -e "ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./dist/ $EC2_USER@$EC2_HOST:~/test/frontend/
-          echo "Changing ownership of the frontend directory..."
-          ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "sudo chown -R www-data:www-data /home/ubuntu/test/frontend"
+
           echo "Reloading Nginx..."
           ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "sudo systemctl reload nginx"
