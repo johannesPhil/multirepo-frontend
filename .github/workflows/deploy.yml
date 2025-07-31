@@ -34,7 +34,7 @@ jobs:
           echo "Testing SSH connection..."
           ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "echo 'SSH connection successful!' && whoami && pwd"
           echo "Creating frontend directory on server..."
-          ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "mkdir -p ~/test/frontend && chmod -R 755 ~/test/frontend"
+          ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "sudo mkdir -p ~/test/frontend && chmod -R 755 ~/test/frontend"
           echo "Deploying files..."
           rsync -avz --delete -e "ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./dist/ $EC2_USER@$EC2_HOST:~/test/frontend/
           echo "Grant execute permission to wwww-data..."
