@@ -13,18 +13,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
-          cache: "npm"
-
+          node-version: '20'
+          cache: 'npm'
       - name: Install dependencies
         run: npm install
-
+      - name: Build the application
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        
-      - name: Build the application
         run: npm run build
-
       - name: Deploy to server
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -35,22 +31,11 @@ jobs:
           set -e
           echo "$EC2_SSH_KEY" > key.pem
           chmod 400 key.pem
-
           echo "Testing SSH connection..."
-          ssh -i key.pem -o "StrictHostKeyChecking=no" $EC2_USER@$EC2_HOST "echo 'SSH connection successful!'"
-
-          echo "Creating Frontend directory on server..."
-          ssh -i key.pem -o "StrictHostKeyChecking=no" $EC2_USER@$EC2_HOST "mkdir -p ~/test/frontend && chmod 755 -R ~/test/frontend" 
-
-          #echo "Creating .env file on server..."
-          #ssh -i key.pem -o "StrictHostKeyChecking=no" $EC2_USER@$EC2_HOST
-          #"echo 'VITE_API_BASE_URL=$VITE_API_BASE_URL' > ~/test/frontend/.env"
-
-          #echo "Creating .env file locally..."
-          #echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env
-
-          echo "Deploying to server..."
-          rsync -avz --delete  -e "ssh -i key.pem -o StrictHostKeyChecking=no" ./dist/ $EC2_USER@$EC2_HOST:~/test/frontend
-
+          ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "echo 'SSH connection successful!' && whoami && pwd"
+          echo "Creating frontend directory on server..."
+          ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "mkdir -p ~/test/frontend && chmod -R 755 ~/test/frontend && chown -R www-data:www-data ~/test/frontend"
+          echo "Deploying files..."
+          rsync -avz --delete -e "ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./dist/ $EC2_USER@$EC2_HOST:~/test/frontend/
           echo "Reloading Nginx..."
           ssh -i key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_USER@$EC2_HOST "sudo systemctl reload nginx"
